@@ -27,14 +27,16 @@ interface Record {
 }
 
 interface AppState {
-    records: Array<Record>
+    records: Array<Record>,
+    changeList: Boolean
 }
 
 
 export default class App extends Component<Props, AppState> {
 
     state:AppState = {
-        records: []
+        records: [],
+        changeList: true
     };
 
     pressTitle = (text:string) => {
@@ -42,7 +44,7 @@ export default class App extends Component<Props, AppState> {
     };
 
     addRecord = () => {
-        const records = this.state.records;
+        const {records, changeList} = this.state;
         records.push({
             id: Math.random() + '',
             amount: Math.floor(Math.random() * 100),
@@ -50,7 +52,7 @@ export default class App extends Component<Props, AppState> {
             type: 1,
             desc: ''
         });
-        this.setState({records});
+        this.setState({records, changeList: !changeList});
     }
 
     renderListItem = ({item}:{item: Record}) => {
@@ -84,7 +86,7 @@ export default class App extends Component<Props, AppState> {
                     data={this.state.records}
                     renderItem={this.renderListItem}
                     keyExtractor={this.keyExtractor}
-                    extraData={this.state}
+                    extraData={this.state.changeList}
                 />
             </View>
         );
