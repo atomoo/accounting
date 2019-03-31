@@ -46,7 +46,6 @@ export function Ignore(target: any, propertyKey: string): void {
     }
 }
 
-
 export function Primary(target: any, propertyKey: string): void {
     const className = target.constructor.name;
     const targetIgnoreKeys = collection[className];

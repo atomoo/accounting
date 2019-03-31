@@ -1,13 +1,13 @@
-import {Model, Entity, Primary, Ignore} from './Model';
+import {Entity, Model, Primary} from './Model';
 
 @Entity()
 class Record extends Model {
     @Primary
-    id: string;
-    amount: number;
-    createTime: Date;
-    type: number;
-    desc?: string;
+    public id: string;
+    public amount: number;
+    public createTime: Date;
+    public type: number;
+    public desc?: string;
 
     constructor(id: string, amount: number, createTime: Date, type: number, desc?: string) {
         super();
