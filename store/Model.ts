@@ -5,8 +5,9 @@ import {AsyncStorage} from 'react-native';
 interface ICollection {
     // key是每个要保存的对象contructor name 对应保存到storage 的key，value 是不需要保存的字段数组
     [key: string]: {
-        storageKey: string,
         ignoreKeys: string[],
+        primary: string,
+        storageKey: string,
     };
 }
 const collection: ICollection = {};
@@ -28,34 +29,62 @@ export function Entity(namespace?: string) {
         else {
             collection[className] = {
                 ignoreKeys: [],
+                primary: 'id',
                 storageKey,
             };
         }
     };
 }
 
-export function Ignore(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+export function Ignore(target: any, propertyKey: string): void {
     const className = target.constructor.name;
-    const targetIgnoreKeys = collection[className];
-    if (Array.isArray(targetIgnoreKeys) && targetIgnoreKeys.indexOf(propertyKey) === -1) {
+    const classInfo = collection[className];
+    const targetIgnoreKeys = classInfo.ignoreKeys;
+    if (Array.isArray(targetIgnoreKeys) && targetIgnoreKeys.indexOf(propertyKey) === -1
+        && propertyKey !== classInfo.primary) {
         collection[className].ignoreKeys.push(propertyKey);
     }
 }
 
+
+export function Primary(target: any, propertyKey: string): void {
+    const className = target.constructor.name;
+    const targetIgnoreKeys = collection[className];
+    if (Array.isArray(targetIgnoreKeys) && targetIgnoreKeys.indexOf(propertyKey) === -1) {
+        collection[className].primary = propertyKey;
+    }
+}
+
 export class Model {
-    public async save() {
+    public static async find<T extends Model>(this: any, cb?: (item: T, index: number) => T[]): Promise<T[]> {
+        await AsyncStorage.getItem('');
+        return [];
+    }
+
+    public async create() {
         const className = this.constructor.name;
         const collectionInfo = collection[className];
         if (collectionInfo) {
-            const saveObj = pickBy(this, (value, key) => !collectionInfo.ignoreKeys.includes(key));
-            await AsyncStorage.setItem(collectionInfo.storageKey, JSON.stringify(saveObj));
+            try {
+                const saveObj: Partial<this> = pickBy(this as any, (value: any, key: string) =>
+                    !collectionInfo.ignoreKeys.includes(key));
+                const oldDataDoc = await AsyncStorage.getItem(collectionInfo.storageKey);
+                let dataToSave: Array<Partial<this>> = [];
+                if (oldDataDoc) {
+                    dataToSave = JSON.parse(oldDataDoc);
+                }
+                dataToSave.push(saveObj);
+                await AsyncStorage.setItem(collectionInfo.storageKey, JSON.stringify(dataToSave));
+            } catch (error) {
+                console.error(error);
+            }
         }
         else {
             throw new Error(`Need to register model`);
         }
     }
+
     public update() {}
-    public search() {}
     public delete() {}
 }
 

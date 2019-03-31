@@ -1,6 +1,8 @@
-import {Model} from './Model';
+import {Model, Entity, Primary, Ignore} from './Model';
 
+@Entity()
 class Record extends Model {
+    @Primary
     id: string;
     amount: number;
     createTime: Date;
