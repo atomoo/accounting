@@ -6,74 +6,59 @@
  * @flow
  */
 
-import React from 'react'
+import React from 'react';
 import { Component } from 'react';
 import {
+    Alert,
+    FlatList,
     StyleSheet,
     View,
-    FlatList,
-    Alert
 } from 'react-native';
 import {Icon, ListItem} from 'react-native-elements';
+import Record from './store/Record';
 
-type Props = {};
-
-interface Record {
-    id: string,
-    amount: number,
-    createTime: Date,
-    type: number,
-    desc?: string
+interface IAppState {
+    changeList: boolean;
+    records: Record[];
 }
 
-interface AppState {
-    records: Array<Record>,
-    changeList: Boolean
-}
+export default class App extends Component<any, IAppState> {
 
-
-export default class App extends Component<Props, AppState> {
-
-    state:AppState = {
+    public state: IAppState = {
+        changeList: true,
         records: [],
-        changeList: true
     };
 
-    pressTitle = (text:string) => {
+    public pressTitle = (text: string) => {
         Alert.alert('title', text);
-    };
+    }
 
-    addRecord = () => {
+    public addRecord = () => {
         const {records, changeList} = this.state;
-        records.push({
-            id: Math.random() + '',
-            amount: Math.floor(Math.random() * 100),
-            createTime: new Date(),
-            type: 1,
-            desc: ''
-        });
+        const r = new Record(Math.random() + '', 1, '', 2);
+        records.push(r);
         this.setState({records, changeList: !changeList});
     }
 
-    renderListItem = ({item}:{item: Record}) => {
+    public renderListItem = ({item}: {item: Record}) => {
         return (
             <ListItem
                 chevron={false}
                 bottomDivider
                 title={item.id}
                 subtitle="as"
-                leftIcon={{name: 'shop', type:'Entypo'}}
+                leftIcon={{name: 'shop', type: 'Entypo'}}
                 rightTitle="+3.00"
                 rightSubtitle="今天 14:00"
             />
         );
-    };
+    }
 
-    keyExtractor = (item:Record) => {
+    public keyExtractor = (item: Record) => {
         return item.id;
-    };
+    }
 
-    render() {
+    public render() {
         return (
             <View style={styles.container}>
                 <View style={styles.nav}>
@@ -95,29 +80,29 @@ export default class App extends Component<Props, AppState> {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#FFF',
+        flex: 1,
+    },
+    item: {
+        backgroundColor: '#eee',
+        borderBottomWidth: 1,
+        borderColor: '#000',
+        borderStyle: 'solid',
+        fontSize: 18,
+        height: 44,
+        padding: 10,
+        width: '100%',
     },
     nav: {
         borderBottomWidth: 1,
         borderColor: '#EEE',
         borderStyle: 'solid',
-        justifyContent: 'flex-end',
         flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginBottom: 0,
         padding: 10,
-        marginBottom: 0
     },
     navItem: {
-        marginRight: 15
-    },
-    item: {
-        padding: 10,
-        fontSize: 18,
-        height: 44,
-        width: '100%',
-        backgroundColor: '#eee',
-        borderBottomWidth: 1,
-        borderColor: '#000',
-        borderStyle: 'solid',
+        marginRight: 15,
     },
 });

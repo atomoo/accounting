@@ -1,15 +1,15 @@
 import {Entity, Model, Primary} from './Model';
 
 @Entity()
-class Record extends Model {
+export default class Record extends Model {
     @Primary
     public id: string;
     public amount: number;
-    public createTime: Date;
+    public createTime: string;
     public type: number;
     public desc?: string;
 
-    constructor(id: string, amount: number, createTime: Date, type: number, desc?: string) {
+    constructor(id: string, amount: number, createTime: string, type: number, desc?: string) {
         super();
         this.id = id;
         this.amount = amount;

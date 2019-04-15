@@ -56,8 +56,23 @@ export function Primary(target: any, propertyKey: string): void {
 
 export class Model {
     public static async find<T extends Model>(this: any, cb?: (item: T, index: number) => T[]): Promise<T[]> {
-        await AsyncStorage.getItem('');
-        return [];
+        const rawData = await AsyncStorage.getItem(collection[this.name].storageKey);
+        let findResult = [];
+        if (rawData) {
+            try {
+                const list = JSON.parse(rawData);
+                if (Array.isArray(list)) {
+                    if (cb) {
+                        findResult = list.filter(cb);
+                    }
+                    findResult = list;
+                }
+            }
+            catch (e) {
+                console.error(e);
+            }
+        }
+        return findResult;
     }
 
     public async create() {
