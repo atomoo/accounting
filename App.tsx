@@ -30,6 +30,22 @@ export default class App extends Component<any, IAppState> {
         records: [],
     };
 
+    public async componentDidMount() {
+        const records = await this.getRecords();
+        const promises = records.map((r) => {
+            return ConsumptionType.find((c: ConsumptionType) => c.type === r.type);
+        });
+        const types = await Promise.all(promises);
+        records.forEach((r, index) => {
+            r.typeDesc = types[index][0].title;
+        });
+        this.setState({records});
+    }
+
+    public async getRecords(): Promise<Record[]> {
+        return await Record.find<Record>();
+    }
+
     public pressTitle = (text: string) => {
         Alert.alert('title', text);
     }
