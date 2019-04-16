@@ -19,7 +19,7 @@ function findCollectionByStorageKey(storageKey: string) {
 export function Entity(namespace?: string) {
     return (target: any) => {
         const className = target.constructor.name;
-        const storageKey: string = namespace || target.constructor.name;
+        const storageKey: string = `@Accounting:${namespace || target.constructor.name}`;
         if (collection[className]) {
             throw new Error(`Duplicate model \`${className}\``);
         }
@@ -55,7 +55,7 @@ export function Primary(target: any, propertyKey: string): void {
 }
 
 export class Model {
-    public static async find<T extends Model>(this: any, cb?: (item: T, index: number) => T[]): Promise<T[]> {
+    public static async find<T extends Model>(this: any, cb?: (item: T, index: number) => boolean): Promise<T[]> {
         const rawData = await AsyncStorage.getItem(collection[this.name].storageKey);
         let findResult = [];
         if (rawData) {
@@ -69,37 +69,36 @@ export class Model {
                 }
             }
             catch (e) {
-                console.error(e);
+                throw new Error(`find ${this.name} error: ${e}`);
             }
         }
         return findResult;
     }
 
-    public async create() {
+    public async create<T extends Model>() {
         const className = this.constructor.name;
         const collectionInfo = collection[className];
         if (collectionInfo) {
             try {
-                const saveObj: Partial<this> = pickBy(this as any, (value: any, key: string) =>
+                const saveObj: Partial<T> = pickBy(this as any, (value: any, key: string) =>
                     !collectionInfo.ignoreKeys.includes(key));
+                let dataList: Array<Partial<T>> = [];
                 const oldDataDoc = await AsyncStorage.getItem(collectionInfo.storageKey);
-                let dataToSave: Array<Partial<this>> = [];
                 if (oldDataDoc) {
-                    dataToSave = JSON.parse(oldDataDoc);
+                    dataList = JSON.parse(oldDataDoc);
+                    const primaryKey = collectionInfo.primary as (keyof Partial<T>);
+                    if (dataList.find((data) => data[primaryKey] === saveObj[primaryKey])) {
+                        throw new Error(`Duplicate data, ${JSON.stringify(saveObj)}`);
+                    }
                 }
-                dataToSave.push(saveObj);
-                await AsyncStorage.setItem(collectionInfo.storageKey, JSON.stringify(dataToSave));
+                dataList.push(saveObj);
+                await AsyncStorage.setItem(collectionInfo.storageKey, JSON.stringify(dataList));
             } catch (error) {
-                console.error(error);
+                throw new Error(`create ${className} error: ${error}`);
             }
         }
         else {
             throw new Error(`Need to register model`);
         }
     }
-
-    public update() {}
-    public delete() {}
 }
-
-// export function

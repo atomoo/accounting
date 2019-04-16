@@ -15,6 +15,7 @@ import {
     View,
 } from 'react-native';
 import {Icon, ListItem} from 'react-native-elements';
+import ConsumptionType from './store/ConsumptionType';
 import Record from './store/Record';
 
 interface IAppState {
@@ -35,7 +36,7 @@ export default class App extends Component<any, IAppState> {
 
     public addRecord = () => {
         const {records, changeList} = this.state;
-        const r = new Record(Math.random() + '', 1, '', 2);
+        const r = new Record(1, Date.now(), '');
         records.push(r);
         this.setState({records, changeList: !changeList});
     }
