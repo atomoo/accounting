@@ -1,5 +1,5 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import {pickBy} from 'lodash';
-import {AsyncStorage} from 'react-native';
 
 // 用来记录保存到AsyncStorage里面的对象
 interface ICollection {
@@ -11,6 +11,7 @@ interface ICollection {
     };
 }
 const collection: ICollection = {};
+const tempCollection: ICollection = {};
 
 function findCollectionByStorageKey(storageKey: string) {
     return Object.keys(collection).find((key: string) => collection[key].storageKey === storageKey);
@@ -18,8 +19,8 @@ function findCollectionByStorageKey(storageKey: string) {
 
 export function Entity(namespace?: string) {
     return (target: any) => {
-        const className = target.constructor.name;
-        const storageKey: string = `@Accounting:${namespace || target.constructor.name}`;
+        const className = target.name;
+        const storageKey: string = `@Accounting:${namespace || className}`;
         if (collection[className]) {
             throw new Error(`Duplicate model \`${className}\``);
         }
@@ -27,30 +28,42 @@ export function Entity(namespace?: string) {
             throw new Error(`Duplicate storageKey \`${storageKey}\``);
         }
         else {
-            collection[className] = {
-                ignoreKeys: [],
-                primary: 'id',
-                storageKey,
-            };
+            collection[className] = tempCollection[className];
+            delete tempCollection[className];
         }
     };
 }
 
 export function Ignore(target: any, propertyKey: string): void {
     const className = target.constructor.name;
-    const classInfo = collection[className];
-    const targetIgnoreKeys = classInfo.ignoreKeys;
-    if (Array.isArray(targetIgnoreKeys) && targetIgnoreKeys.indexOf(propertyKey) === -1
-        && propertyKey !== classInfo.primary) {
-        collection[className].ignoreKeys.push(propertyKey);
+    const classInfo = tempCollection[className];
+    if (tempCollection[className]) {
+        const targetIgnoreKeys = classInfo.ignoreKeys;
+        if (Array.isArray(targetIgnoreKeys) && targetIgnoreKeys.indexOf(propertyKey) === -1
+            && propertyKey !== classInfo.primary) {
+            tempCollection[className].ignoreKeys.push(propertyKey);
+        }
+    }
+    else {
+        tempCollection[className] = {
+            ignoreKeys: [propertyKey],
+            primary: '',
+            storageKey: `@Accounting:${className}`,
+        };
     }
 }
 
 export function Primary(target: any, propertyKey: string): void {
     const className = target.constructor.name;
-    const targetIgnoreKeys = collection[className];
-    if (Array.isArray(targetIgnoreKeys) && targetIgnoreKeys.indexOf(propertyKey) === -1) {
-        collection[className].primary = propertyKey;
+    if (tempCollection[className]) {
+        tempCollection[className].primary = propertyKey;
+    }
+    else {
+        tempCollection[className] = {
+            ignoreKeys: [],
+            primary: propertyKey,
+            storageKey: `@Accounting:${className}`,
+        };
     }
 }
 

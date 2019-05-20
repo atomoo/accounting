@@ -15,6 +15,7 @@ import {
     View,
 } from 'react-native';
 import {Icon, ListItem} from 'react-native-elements';
+import {createAppContainer, createStackNavigator} from 'react-navigation';
 import ConsumptionType from './store/ConsumptionType';
 import Record from './store/Record';
 
@@ -23,7 +24,7 @@ interface IAppState {
     records: Record[];
 }
 
-export default class App extends Component<any, IAppState> {
+class App extends Component<any, IAppState> {
 
     public state: IAppState = {
         changeList: true,
@@ -123,3 +124,11 @@ const styles = StyleSheet.create({
         marginRight: 15,
     },
 });
+
+const AppNavigator = createStackNavigator({
+    Home: {
+      screen: App,
+    },
+});
+
+export default createAppContainer(AppNavigator);
