@@ -1,15 +1,22 @@
+import moment from 'moment';
 import React, {useEffect, useState} from 'react';
-import {Picker, View, Alert} from 'react-native';
+import {Picker, View} from 'react-native';
 import {Button, Icon, Input, Text} from 'react-native-elements';
 import DateTimePicker from 'react-native-modal-datetime-picker';
+import {NavigationParams, NavigationRoute, NavigationScreenProp} from 'react-navigation';
 import ConsumptionType from '../store/ConsumptionType';
 
+moment.locale('zh-cn');
 interface IPickerOption {
     label: string;
     value: string;
 }
 
-const RecordForm: React.FC = () => {
+interface IRecordFormProps {
+    navigation: NavigationScreenProp<NavigationRoute<NavigationParams>>;
+}
+
+const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
     const [amount, setAmount] = useState();
     const [amountError, setAmountError] = useState('');
     const [pickerOptions, setPickerOptions] = useState<IPickerOption[]>([]);
@@ -36,8 +43,6 @@ const RecordForm: React.FC = () => {
         setDesc(descInput);
     };
 
-    const handleSubmit = () => {};
-
     const showDateTimePicker = () => {
         setDatePickerVisible(true);
     };
@@ -48,7 +53,14 @@ const RecordForm: React.FC = () => {
 
     const dateTimeChange = (date: Date) => {
         setCreateTime(date);
+        setDatePickerVisible(false);
     };
+
+    const goToCategory = () => {
+        props.navigation.navigate('ConsumTypeForm');
+    };
+
+    const handleSubmit = () => {};
 
     useEffect(() => {
         async function getAllType() {
@@ -70,6 +82,7 @@ const RecordForm: React.FC = () => {
     return <View style={{marginTop: 10, flex: 1}}>
         <Input placeholder="请输入消费金额"
             label="金额"
+            labelStyle={{fontSize: 18}}
             keyboardType="decimal-pad"
             textContentType="none"
             leftIcon={<Icon type="font-awesome" name="cny" />}
@@ -78,7 +91,7 @@ const RecordForm: React.FC = () => {
             value={amount}
             spellCheck={false}
         />
-        <Text style={{fontSize: 16, color: '#86939E', fontWeight: 'bold', margin: 10}}>
+        <Text style={{fontSize: 18, color: '#86939E', fontWeight: 'bold', margin: 10}}>
             分类
         </Text>
         <View style={{flexDirection: 'row', alignItems: 'center', margin: 10, marginTop: 0}}>
@@ -92,13 +105,13 @@ const RecordForm: React.FC = () => {
                     }
                 </Picker>
             </View>
-            <Button title="添加分类" type="clear" containerStyle={{width: 100}} />
+            <Button title="添加分类" type="clear" containerStyle={{width: 100}} onPress={goToCategory} />
         </View>
-        <Text style={{fontSize: 16, color: '#86939E', fontWeight: 'bold', margin: 10}}>
+        <Text style={{fontSize: 18, color: '#86939E', fontWeight: 'bold', margin: 10}}>
             创建时间
         </Text>
         <View style={{flexDirection: 'row', alignItems: 'center', margin: 10, marginTop: 0}}>
-            <Text>{createTime.toString()}</Text>
+            <Text style={{fontSize: 16}}>{moment(createTime).format('YYYY-MM-DD HH:mm:ss')}</Text>
             <Button containerStyle={{width: 100}} title="选择时间" type="clear" onPress={showDateTimePicker} />
         </View>
         <DateTimePicker mode="datetime"
@@ -108,6 +121,7 @@ const RecordForm: React.FC = () => {
         />
         <Input placeholder="描述信息"
             label="备注"
+            labelStyle={{fontSize: 18}}
             multiline
             textContentType="none"
             value={desc}
