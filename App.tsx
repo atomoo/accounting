@@ -53,7 +53,7 @@ const AppNavigator = createStackNavigator(
                 </View>,
             };
         },
-        initialRouteName: 'ConsumTypeForm',
+        initialRouteName: 'Home',
     },
 );
 

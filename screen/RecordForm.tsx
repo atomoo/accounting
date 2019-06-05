@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react';
 import {Picker, View} from 'react-native';
 import {Button, Icon, Input, Text} from 'react-native-elements';
 import DateTimePicker from 'react-native-modal-datetime-picker';
-import {NavigationParams, NavigationRoute, NavigationScreenProp} from 'react-navigation';
+import {NavigationEvents, NavigationParams, NavigationRoute, NavigationScreenProp} from 'react-navigation';
 import ConsumptionType from '../store/ConsumptionType';
 
 moment.locale('zh-cn');
@@ -62,24 +62,22 @@ const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
 
     const handleSubmit = () => {};
 
-    useEffect(() => {
-        async function getAllType() {
-            const types = await ConsumptionType.find<ConsumptionType>();
-            if (types.length > 0) {
-                const pickerOptionsFromStore = types.map((t) => ({
-                    label: t.title,
-                    value: t.name,
-                }));
-                setPickerOptions(pickerOptionsFromStore);
-                if (pickerOptionsFromStore.length > 0) {
-                    setConsumptionType(pickerOptionsFromStore[0].value);
-                }
+    async function getAllType() {
+        const types = await ConsumptionType.find<ConsumptionType>();
+        if (types.length > 0) {
+            const pickerOptionsFromStore = types.map((t) => ({
+                label: t.title,
+                value: t.name,
+            }));
+            setPickerOptions(pickerOptionsFromStore);
+            if (pickerOptionsFromStore.length > 0) {
+                setConsumptionType(pickerOptionsFromStore[0].value);
             }
         }
-        getAllType();
-    }, []);
+    }
 
     return <View style={{marginTop: 10, flex: 1}}>
+        <NavigationEvents onWillFocus={getAllType} />
         <Input placeholder="请输入消费金额"
             label="金额"
             labelStyle={{fontSize: 18}}
@@ -129,7 +127,13 @@ const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
             onChangeText={handleDescChange}
         />
         <Button title="提交"
-            containerStyle={{marginLeft: 10, marginRight: 10, justifyContent: 'flex-end', flex: 1, marginBottom: 30}}
+            containerStyle={{
+                flex: 1,
+                justifyContent: 'flex-end',
+                marginBottom: 30,
+                marginLeft: 10,
+                marginRight: 10,
+            }}
             onPress={handleSubmit}
         />
     </View>;
