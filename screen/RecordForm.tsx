@@ -1,16 +1,12 @@
 import moment from 'moment';
-import React, {useEffect, useState} from 'react';
-import {Picker, View} from 'react-native';
+import React, {useState} from 'react';
+import {Alert, Picker, View} from 'react-native';
 import {Button, Icon, Input, Text} from 'react-native-elements';
 import DateTimePicker from 'react-native-modal-datetime-picker';
 import {NavigationEvents, NavigationParams, NavigationRoute, NavigationScreenProp} from 'react-navigation';
 import ConsumptionType from '../store/ConsumptionType';
 
 moment.locale('zh-cn');
-interface IPickerOption {
-    label: string;
-    value: string;
-}
 
 interface IRecordFormProps {
     navigation: NavigationScreenProp<NavigationRoute<NavigationParams>>;
@@ -19,7 +15,7 @@ interface IRecordFormProps {
 const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
     const [amount, setAmount] = useState();
     const [amountError, setAmountError] = useState('');
-    const [pickerOptions, setPickerOptions] = useState<IPickerOption[]>([]);
+    const [pickerOptions, setPickerOptions] = useState<ConsumptionType[]>([]);
     const [consumptionType, setConsumptionType] = useState();
     const [desc, setDesc] = useState('');
     const [datePickerVisible, setDatePickerVisible] = useState(false);
@@ -60,7 +56,9 @@ const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
         props.navigation.navigate('ConsumTypeForm');
     };
 
-    const handleSubmit = () => {};
+    const handleSubmit = () => {
+        Alert.alert('submit');
+    };
 
     async function getAllType() {
         const types = await ConsumptionType.find<ConsumptionType>();
@@ -69,10 +67,8 @@ const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
                 label: t.title,
                 value: t.name,
             }));
-            setPickerOptions(pickerOptionsFromStore);
-            if (pickerOptionsFromStore.length > 0) {
-                setConsumptionType(pickerOptionsFromStore[0].value);
-            }
+            setPickerOptions(types);
+            setConsumptionType(types[0].name);
         }
     }
 
@@ -99,7 +95,7 @@ const RecordForm: React.FC<IRecordFormProps> = (props: IRecordFormProps) => {
                     onValueChange={handleTypeChange}
                 >
                     {
-                        pickerOptions.map((o) => <Picker.Item key={o.value} label={o.label} value={o.value} />)
+                        pickerOptions.map((o) => <Picker.Item key={o.name} label={o.title} value={o.name} />)
                     }
                 </Picker>
             </View>
