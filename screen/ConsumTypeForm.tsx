@@ -83,7 +83,7 @@ const ConsumTypeForm: React.FC = () => {
         <Button title="type和name的设置参考文档"
             type="clear"
             containerStyle={{marginTop: 20}}
-            icon={<Icon type="feather" name="help-circle" color="#2089DC" />}
+            icon={<Icon type="antdesign" name="question" color="#2089DC" />}
             onPress={openHelpDoc}
         />
         <Button title="添加"

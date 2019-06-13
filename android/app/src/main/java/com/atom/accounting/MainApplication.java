@@ -1,4 +1,4 @@
-package com.awesomeproject;
+package com.atom.accounting;
 
 import android.app.Application;
 

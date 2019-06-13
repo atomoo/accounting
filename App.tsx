@@ -42,7 +42,7 @@ const AppNavigator = createStackNavigator(
                         navigation.navigation.state.routeName === 'Home'
                         && (
                             <Icon name="plus"
-                                type="feather"
+                                type="antdesign"
                                 iconStyle={{marginRight: 10}}
                                 onPress={() => {
                                     navigation.navigation.navigate('Add');

@@ -1,10 +1,10 @@
 {
-  "name": "AwesomeProject",
-  "displayName": "AwesomeProject",
+  "name": "Accounting",
+  "displayName": "Accounting",
   "expo": {
-    "slug": "AwesomeProject",
-    "name": "AwesomeProject",
+    "slug": "Accounting",
+    "name": "Accounting",
     "sdkVersion": "32.0.0",
-    "entryPoint": "/Users/yangpei01/study/AwesomeProject/.vscode/exponentIndex.js"
+    "entryPoint": "/Users/yangpei01/study/accounting/.vscode/exponentIndex.js"
   }
 }
